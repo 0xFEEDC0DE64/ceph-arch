@@ -4,7 +4,7 @@
 pkgbase='ceph'
 pkgname=('ceph' 'ceph-libs' 'ceph-mgr')
 _zstdver=1.5.2
-pkgver=17.2.3
+pkgver=17.2.4
 pkgrel=1
 pkgdesc='Distributed, fault-tolerant storage platform delivering object, block, and file system'
 arch=('x86_64')
@@ -77,7 +77,7 @@ source=(
 
   #https://gitweb.gentoo.org/repo/gentoo.git/plain/sys-cluster/ceph/files/ceph-17.2.0-no-virtualenvs.patch
 )
-sha512sums=('fd6e057ba8440f69423e870dddb2705d68015089ff8d97356bdc359c2ab41e19351fb1c914330de6ba05180f48e328e3ea4c877e9dd80be049e2ec5895068595'
+sha512sums=('430e916004a697bddda8cb7a83026b6e0e2b2e618e645df48c0580d16d7370d5a40d94b802db5b344faeab7c4e48d65c8ade47d0cbf0eaa0e7ddf399b09a279d'
             '4354001c1abd9a0c385ba7bd529e3638fb6660b6a88d4e49706d4ac21c81b8e829303a20fb5445730bdac18c4865efb10bc809c1cd56d743c12aa9a52e160049'
             '9e6bb46d5bbdc5d93f4f026b2a8d6bdb692d9ea6e7018c1bb0188d95ea8574c76238d968b340fd67ddaa3d8183b310e393e3549dc3a63a795fde696413b0ca94'
             '6ff46a90d76f667fa23be0f9eb1ed2fb7e30af9a2621aec19944d0a22a431a0f5721603c588286e483ff55c14aac920adfccb039c9678a87cc59640dd70367ae'
@@ -110,7 +110,7 @@ prepare() {
   for filename in "${source[@]%%::*}"; do
     if [[ "${filename}" =~ \.patch$ ]]; then
       echo "Applying patch ${filename##*/}"
-      patch -p1 -N -i "${srcdir}/${filename##*/}"
+      patch -p1 -N -i "${srcdir}/${filename##*/}" || true
     fi
   done
 
