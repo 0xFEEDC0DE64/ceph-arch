@@ -4,7 +4,7 @@
 pkgbase='ceph'
 pkgname=('ceph' 'ceph-libs' 'ceph-mgr')
 _zstdver=1.5.2
-pkgver=17.2.0
+pkgver=17.2.3
 pkgrel=1
 pkgdesc='Distributed, fault-tolerant storage platform delivering object, block, and file system'
 arch=('x86_64')
@@ -68,19 +68,16 @@ source=(
   # https://github.com/ceph/ceph/pull/44112
   ceph-17.2.0-python-PY_SSIZE_T_CLEAN.patch::https://github.com/ceph/ceph/commit/06e1ef35a8bad958bd735bdd2683e732cf733d86.patch
 
-  # Fix linkage when using system Arrow
-  ceph-17.2.0-fix-linkage-with-system-arrow.patch::https://github.com/ceph/ceph/commit/d122ca2fd936eaa242ae1c687f2c6d4767397f2e.patch
-
-  # Fix building with RocksDB 7+
-  ceph-17.2.0-rocksdb7-compat.patch::https://github.com/ceph/ceph/commit/eea10281e6f4078f261b05b6bd9c9c9aec129201.patch
-
   # Fix building with gcc 12+
   ceph-17.2.0-gcc12-missing-memory-include.patch::https://github.com/ceph/ceph/commit/7c381ba985bd1398ef7d145cc00fae9d0db510e3.patch
   ceph-17.2.0-gcc12-FTBFS-due-to-dout-and-need_dynamic.patch::https://github.com/ceph/ceph/commit/963d756ded40f5adf2efef53893c917bec1845c1.patch
 
+  # Build fix for fmt9
+  1ccb724fc004b2de0a92b35ad04eed3a5fef846c.patch::https://github.com/ceph/ceph/commit/1ccb724fc004b2de0a92b35ad04eed3a5fef846c.patch
+
   #https://gitweb.gentoo.org/repo/gentoo.git/plain/sys-cluster/ceph/files/ceph-17.2.0-no-virtualenvs.patch
 )
-sha512sums=('70b96e709f153f16069bec8346ea73812d699eaab91a012351d02addb3fd176b84fce32c3dae84fdf91d0ffe49f2bb258410b47caeee81d81a672b4dbd04cc7e'
+sha512sums=('fd6e057ba8440f69423e870dddb2705d68015089ff8d97356bdc359c2ab41e19351fb1c914330de6ba05180f48e328e3ea4c877e9dd80be049e2ec5895068595'
             '4354001c1abd9a0c385ba7bd529e3638fb6660b6a88d4e49706d4ac21c81b8e829303a20fb5445730bdac18c4865efb10bc809c1cd56d743c12aa9a52e160049'
             '9e6bb46d5bbdc5d93f4f026b2a8d6bdb692d9ea6e7018c1bb0188d95ea8574c76238d968b340fd67ddaa3d8183b310e393e3549dc3a63a795fde696413b0ca94'
             '6ff46a90d76f667fa23be0f9eb1ed2fb7e30af9a2621aec19944d0a22a431a0f5721603c588286e483ff55c14aac920adfccb039c9678a87cc59640dd70367ae'
@@ -88,10 +85,9 @@ sha512sums=('70b96e709f153f16069bec8346ea73812d699eaab91a012351d02addb3fd176b84f
             '393fb0488dd2652550660684b46d5edb840e966b8b617ad697df75a224444918ce7443c8e74929533131dd6c0761add6896005fd335aa239ebc56a5b55f1c93e'
             '2234d005df71b3b6013e6b76ad07a5791e3af7efec5f41c78eb1a9c92a22a67f0be9560be59b52534e90bfe251bcf32c33d5d40163f3f8f7e7420691f0f4a222'
             'f49427d3420574043e18cad517a6f81ee38a48b827195f564fd728fd2f2b32dbf17f9e21842b01bbf3ab40875c70b0db316a478b8cc48dd92c839d2ce5e7fd63'
-            '5a40347785dd1194150d63a7229b68525503969e89fa8867770b1aec3c7a56497930c9ed58cbae346b1a292af350b86340a3041241df9d13433cf2a298e72ec2'
-            '9313d18d77d18c76d3d37f8008573031106108f4252054e887aa3b90542247fdb6deceb983defcfbc2650f646d07fc5a97a2fcb0874853f33e0731b3a6d32d00'
             'f1b54767d8d3c12ca9fe9eafd0590efa8560a52b5c18f1121f8fd8b7e69d70578bdeae9a1803612a8a8d0032f039f8786b5152a889ba359850e3d3d30a6af8c7'
-            'e54ee5223831b23676f4de7a49fc2548e5deb524ecc0e75a6d4dac1c5e69e9f8fb9bb5fd2e423dd548ad7dd7e3d6c7b4a0e9e68ceaabfa1add8f025687bd4e60')
+            'e54ee5223831b23676f4de7a49fc2548e5deb524ecc0e75a6d4dac1c5e69e9f8fb9bb5fd2e423dd548ad7dd7e3d6c7b4a0e9e68ceaabfa1add8f025687bd4e60'
+            '59d23b9d0a5749f588270ff89e852090380211f58c81d896574cdf033ea9427dfbd39d8780edef3e4c4b2f20346b498f791bbdb2ded7ae6d81b5340767a2f2de')
 
 
 # -fno-plt causes linker errors (undefined reference to internal methods)
@@ -102,6 +98,9 @@ sha512sums=('70b96e709f153f16069bec8346ea73812d699eaab91a012351d02addb3fd176b84f
 export CFLAGS="${CFLAGS/-fno-plt/}"
 export CXXFLAGS="${CXXFLAGS/-fno-plt/}"
 
+# Build fix for fmt9 https://tracker.ceph.com/issues/56610
+CFLAGS+=" -DFMT_DEPRECATED_OSTREAM"
+CXXFLAGS+=" -DFMT_DEPRECATED_OSTREAM"
 
 prepare() {
   cd "${srcdir}/${pkgbase}-${pkgver}"
